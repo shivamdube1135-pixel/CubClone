@@ -7,7 +7,7 @@ SDK="${ANDROID_HOME:-D:/Dev/Android/Sdk}"
 AJ="$SDK/platforms/android-36/android.jar"
 JAVA="${JAVA_HOME:-D:/Dev/Java/Env/jdk-21.0.12.1+1}"
 BT="$SDK/build-tools/35.0.0"
-PY="D:/Dev/Python/Env/Python312/python.exe"
+PY="${PYTHON:-python}"
 
 [ -f "$AJ" ] || { echo "找不到 android.jar: $AJ"; exit 1; }
 [ -f "$BT/d8.bat" ] || [ -f "$BT/d8" ] || { echo "找不到 d8: $BT"; exit 1; }
