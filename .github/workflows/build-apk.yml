@@ -4,7 +4,8 @@ name: Build Original CubClone APK
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,55 +13,33 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Java 21
-        uses: actions/setup-java@v4
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Python 3.12
-        uses: actions/setup-python@v5
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
-      - name: Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install SDK components
+      - name: Install Android SDK components
         shell: pwsh
         run: |
           sdkmanager "platforms;android-36" "build-tools;35.0.0"
 
-      - name: Prepare signing key
+      - name: Prepare Python
         shell: pwsh
         run: |
-          $key = "$env:GITHUB_WORKSPACE/cubclone-ci.jks"
-          keytool -genkeypair -v `
-            -keystore $key `
-            -alias cubclone `
-            -keyalg RSA `
-            -keysize 2048 `
-            -validity 10000 `
-            -storepass cubclone123 `
-            -keypass cubclone123 `
-            -dname "CN=CubClone CI"
+          "PYTHON=python" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-          @"
-          storeFile=$key
-          storePassword=cubclone123
-          keyAlias=cubclone
-          keyPassword=cubclone123
-          "@ | Set-Content signing.properties
-
-          "CUBCLONE_SIGNING=$env:GITHUB_WORKSPACE/signing.properties" |
-            Out-File -FilePath $env:GITHUB_ENV -Append
-
-          "PYTHON=python" |
-            Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Build helper
+      - name: Build Helper
         shell: bash
         run: bash proto/build.sh
 
